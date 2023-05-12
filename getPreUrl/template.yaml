@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  sam-app
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Resources:
+  S3Bucket:
+  # S3 버킷 생성
+    Type: 'AWS::S3::Bucket'
+
+  getPreUrlLambdaFunction:
+  # 람다 함수 생성
+    Type: AWS::Serverless::Function
+    Properties:
+      # 함수 소스코드 경로 및 함수명
+      Handler: src/handlers/get-preurl-lambda.getPreUrllambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: get-s3-preurl-for-upload
+      # 람다 함수에 적용될 정책
+      Policies:
+        - AWSLambdaBasicExecutionRole # 함수 실행 권한
+        - AmazonS3FullAccess # S3 PUT, GET 권한
+      Environment:
+        Variables:
+          BucketName: !Ref S3Bucket # 람다함수의 환경변수에 넣어질 S3 버킷명
+      # API Gateway 명
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /s3
+            Method: get
